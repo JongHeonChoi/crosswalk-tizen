@@ -41,6 +41,7 @@ BuildRequires: pkgconfig(notification)
 BuildRequires: pkgconfig(pkgmgr-info)
 BuildRequires: pkgconfig(sqlite3)
 BuildRequires: pkgconfig(uuid)
+BuildRequires: pkgconfig(ttrace)
 
 %description
 Crosswalk Runtime and AppShell for Tizen 3.0 and later
