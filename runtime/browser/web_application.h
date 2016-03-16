@@ -102,6 +102,7 @@ class WebApplication : public WebView::EventListener {
   bool debug_mode_;
   Ewk_Context* ewk_context_;
   NativeWindow* window_;
+  WebView* view_;
   std::string appid_;
   std::string app_data_path_;
   std::list<WebView*> view_stack_;

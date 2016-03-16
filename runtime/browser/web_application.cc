@@ -209,6 +209,7 @@ WebApplication::WebApplication(
       ewk_context_(
           ewk_context_new_with_injected_bundle_path(INJECTED_BUNDLE_PATH)),
       window_(window),
+      view_(NULL),
       appid_(app_data->app_id()),
       locale_manager_(new common::LocaleManager()),
       app_data_(std::move(app_data)),
@@ -227,6 +228,7 @@ WebApplication::WebApplication(
 
 WebApplication::~WebApplication() {
   if (ewk_context_) ewk_context_delete(ewk_context_);
+  if (view_) delete view_;
 }
 
 bool WebApplication::Initialize() {
@@ -347,19 +349,19 @@ void WebApplication::Launch(std::unique_ptr<common::AppControl> appcontrol) {
   ewk_context_tizen_app_id_set(ewk_context_, appid_.c_str());
 
   // Setup View
-  WebView* view = new WebView(window_, ewk_context_);
-  SetupWebView(view);
+  view_ = new WebView(window_, ewk_context_);
+  SetupWebView(view_);
 
   std::unique_ptr<common::ResourceManager::Resource> res =
       resource_manager_->GetStartResource(appcontrol.get());
-  view->SetDefaultEncoding(res->encoding());
+  view_->SetDefaultEncoding(res->encoding());
 
   STEP_PROFILE_END("OnCreate -> URL Set");
   STEP_PROFILE_START("URL Set -> Rendered");
 
-  window_->SetContent(view->evas_object());
-  view->LoadUrl(res->uri(), res->mime());
-  view_stack_.push_front(view);
+  window_->SetContent(view_->evas_object());
+  view_->LoadUrl(res->uri(), res->mime());
+  view_stack_.push_front(view_);
 
 
   if (appcontrol->data(kDebugKey) == "true") {
