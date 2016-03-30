@@ -25,6 +25,7 @@
 #include <memory>
 #include <sstream>
 #include <vector>
+#include <efl_extension.h>
 
 #include "common/application_data.h"
 #include "common/app_db.h"
@@ -652,6 +653,28 @@ void WebApplication::OnConsoleMessage(const std::string& msg, int level) {
 void WebApplication::OnLowMemory() {
   ewk_context_cache_clear(ewk_context_);
   ewk_context_notify_low_memory(ewk_context_);
+}
+
+void WebApplication::OnRotaryEvent(WebView* /*view*/,
+                                   Eext_Rotary_Event_Info* info) {
+  LOGGER(DEBUG) << "OnRotaryEvent";
+  std::stringstream script;
+  script
+    << "(function(){"
+    << "var __event = document.createEvent(\"CustomEvent\");\n"
+    << "var __detail = {};\n"
+    << "__event.initCustomEvent(\"rotarydetent\", true, true, __detail);\n"
+    << "__event.detail.direction = \""
+    << (info->direction == EEXT_ROTARY_DIRECTION_CLOCKWISE ? "CW" : "CCW")
+    << "\";\n"
+    << "document.dispatchEvent(__event);\n"
+    << "\n"
+    << "for (var i=0; i < window.frames.length; i++)\n"
+    << "{ window.frames[i].document.dispatchEvent(__event); }"
+    << "})()";
+  std::string kRotaryEventScript = script.str();
+  if (view_stack_.size() > 0 && view_stack_.front() != NULL)
+    view_stack_.front()->EvalJavascript(kRotaryEventScript.c_str());
 }
 
 bool WebApplication::OnContextMenuDisabled(WebView* /*view*/) {

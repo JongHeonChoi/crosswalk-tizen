@@ -75,6 +75,7 @@ class WebViewImpl {
   void InitCertificateAllowCallback();
   void InitPopupWaitCallback();
   void InitUsermediaCallback();
+  void InitRotaryEventCallback();
 
   NativeWindow* window_;
   Ewk_Context* context_;

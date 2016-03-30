@@ -19,6 +19,7 @@
 #include <ewk_chromium.h>
 #include <functional>
 #include <sstream>
+#include <efl_extension.h>
 
 #include "runtime/browser/native_window.h"
 #include "runtime/browser/web_view_impl.h"

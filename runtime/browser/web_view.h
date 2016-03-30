@@ -21,6 +21,7 @@
 #include <ewk_chromium.h>
 #include <functional>
 #include <string>
+#include <efl_extension.h>
 
 #include "runtime/browser/native_window.h"
 
@@ -87,6 +88,9 @@ class WebView {
         WebView* /*view*/,
         const std::string& /*url*/,
         std::function<void(bool)> /*result_handler*/) {}
+    virtual void OnRotaryEvent(
+        WebView* /*view*/,
+        Eext_Rotary_Event_Info* info) {}
   };
 
   WebView(NativeWindow* window, Ewk_Context* context);

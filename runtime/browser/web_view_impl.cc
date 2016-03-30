@@ -199,6 +199,7 @@ void WebViewImpl::Initialize() {
   InitCertificateAllowCallback();
   InitPopupWaitCallback();
   InitUsermediaCallback();
+  InitRotaryEventCallback();
 
   Ewk_Settings* settings = ewk_view_settings_get(ewk_view_);
   ewk_settings_scripts_can_open_windows_set(settings, EINA_TRUE);
@@ -823,6 +824,21 @@ void WebViewImpl::InitUsermediaCallback() {
     return EINA_TRUE;
   };
   ewk_view_user_media_permission_callback_set(ewk_view_, callback, this);
+}
+
+void WebViewImpl::InitRotaryEventCallback() {
+  auto rotary_callback = [](void* user_data,
+                         Evas_Object* /*obj*/,
+                         Eext_Rotary_Event_Info* event_info) -> Eina_Bool {
+    WebViewImpl* self = static_cast<WebViewImpl*>(user_data);
+    Eext_Rotary_Event_Info* rotary = event_info;
+    self->listener_->OnRotaryEvent(self->view_, rotary);
+    return EINA_TRUE;
+  };
+
+  // add callback to handle rotary event
+  eext_rotary_object_event_callback_add(ewk_view_, rotary_callback, this);
+  eext_rotary_object_event_activated_set(ewk_view_, EINA_TRUE);
 }
 
 std::string WebViewImpl::GetUrl() {

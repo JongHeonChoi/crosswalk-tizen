@@ -21,6 +21,7 @@
 #include <list>
 #include <memory>
 #include <string>
+#include <efl_extension.h>
 
 #include "runtime/browser/web_view.h"
 
@@ -89,6 +90,8 @@ class WebApplication : public WebView::EventListener {
   virtual void OnUsermediaPermissionRequest(
       WebView* view, const std::string& url,
       std::function<void(bool)> result_handler);
+  virtual void OnRotaryEvent(WebView* view,
+      Eext_Rotary_Event_Info* info);
 
  private:
   bool Initialize();
