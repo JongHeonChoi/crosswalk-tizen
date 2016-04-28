@@ -220,7 +220,7 @@ WebApplication::WebApplication(
   std::unique_ptr<char, decltype(std::free)*> path{app_get_data_path(),
                                                    std::free};
   app_data_path_ = path.get();
-  LOGGER(ERROR) << "path is " << path.get();
+  LOGGER(DEBUG) << "path is " << path.get();
   splash_screen_.reset(new SplashScreen(
       window_, app_data_->splash_screen_info(), app_data_->application_path()));
   resource_manager_.reset(
@@ -371,7 +371,6 @@ void WebApplication::Launch(std::unique_ptr<common::AppControl> appcontrol) {
   window_->SetContent(view->evas_object());
   view->LoadUrl(res->uri(), res->mime());
   view_stack_.push_front(view);
-
 
   if (appcontrol->data(kDebugKey) == "true") {
     debug_mode_ = true;

@@ -14,35 +14,33 @@
  *    limitations under the License.
  */
 
-#ifndef XWALK_RUNTIME_BROWSER_RUNTIME_H_
-#define XWALK_RUNTIME_BROWSER_RUNTIME_H_
+#ifndef XWALK_RUNTIME_BROWSER_IME_RUNTIME_H_
+#define XWALK_RUNTIME_BROWSER_IME_RUNTIME_H_
 
 #include <app.h>
+#include <inputmethod.h>
 #include <string>
 
 #include "runtime/browser/native_window.h"
-#include "runtime/browser/web_application.h"
+#include "runtime/browser/ime_application.h"
 
 namespace runtime {
 
-class Runtime {
+class ImeRuntime {
  public:
-  Runtime(std::unique_ptr<common::ApplicationData> app_data);
-  virtual ~Runtime();
+  ImeRuntime(std::unique_ptr<common::ApplicationData> app_data);
+  virtual ~ImeRuntime();
 
   virtual int Exec(int argc, char* argv[]);
 
- protected:
-  virtual bool OnCreate();
+  virtual void OnCreate();
   virtual void OnTerminate();
-  virtual void OnPause();
-  virtual void OnResume();
-  virtual void OnAppControl(app_control_h app_control);
-  virtual void OnLanguageChanged(const std::string& language);
-  virtual void OnLowMemory();
+  virtual void OnShow(int context_id, ime_context_h context);
+  virtual void OnHide(int context_id);
+  virtual void OnAppControl();
 
  private:
-  WebApplication* application_;
+  ImeApplication* application_;
   NativeWindow* native_window_;
   std::string app_id_;
   std::unique_ptr<common::ApplicationData> app_data_;
@@ -50,4 +48,4 @@ class Runtime {
 
 }  // namespace runtime
 
-#endif  // XWALK_RUNTIME_BROWSER_RUNTIME_H_
+#endif  // XWALK_RUNTIME_BROWSER_IME_RUNTIME_H_

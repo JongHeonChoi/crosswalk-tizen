@@ -60,6 +60,22 @@
         ['profile == "wearable"', {
           'defines': ['PROFILE_WEARABLE'],
         }],
+        ['tizen_feature_web_ime_support == 1', {
+          'defines': ['IME_FEATURE_SUPPORT'],
+          'sources': [
+            'browser/ime_runtime.h',
+            'browser/ime_runtime.cc',
+            'browser/ime_application.h',
+            'browser/ime_application.cc',
+            'browser/native_ime_app_window.h',
+            'browser/native_ime_app_window.cc',
+          ],
+          'variables': {
+            'packages': [
+              'capi-ui-inputmethod',
+            ],
+          },
+        }],
       ],
     }, # end of target 'xwalk_runtime'
     {

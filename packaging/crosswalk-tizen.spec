@@ -44,6 +44,23 @@ BuildRequires: pkgconfig(uuid)
 BuildRequires: pkgconfig(launchpad)
 BuildRequires: pkgconfig(ttrace)
 
+%if "%{?profile}" == "mobile"
+%define tizen_feature_web_ime_support     1
+%endif
+
+%if "%{?profile}" == "wearable"
+%define tizen_feature_web_ime_support     1
+%endif
+
+%if "%{?profile}" == "tv"
+%define tizen_feature_web_ime_support     0
+%endif
+
+%if 0%{?tizen_feature_web_ime_support}
+BuildRequires: pkgconfig(capi-ui-inputmethod)
+%endif
+
+
 Requires: /usr/bin/systemctl
 
 %description
@@ -65,6 +82,9 @@ GYP_OPTIONS="$GYP_OPTIONS -Dbuild_type=Debug"
 %else
 GYP_OPTIONS="$GYP_OPTIONS -Dbuild_type=Release"
 %endif
+
+# Feature flags
+GYP_OPTIONS="$GYP_OPTIONS -Dtizen_feature_web_ime_support=%{?tizen_feature_web_ime_support}"
 
 # Extension Path
 GYP_OPTIONS="$GYP_OPTIONS -Dextension_path=%{extension_path}"

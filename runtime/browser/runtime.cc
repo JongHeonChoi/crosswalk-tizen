@@ -45,9 +45,11 @@ static NativeWindow* CreateNativeWindow() {
 
 }  // namespace
 
-Runtime::Runtime()
+Runtime::Runtime(std::unique_ptr<common::ApplicationData> app_data)
     : application_(NULL),
-      native_window_(NULL) {
+      native_window_(NULL),
+      app_id_(app_data->app_id()),
+      app_data_(std::move(app_data)) {
 }
 
 Runtime::~Runtime() {
@@ -64,26 +66,16 @@ bool Runtime::OnCreate() {
   STEP_PROFILE_END("Start -> OnCreate");
   STEP_PROFILE_START("OnCreate -> URL Set");
 
-  common::CommandLine* cmd = common::CommandLine::ForCurrentProcess();
-  std::string appid = cmd->GetAppIdFromCommandLine(kRuntimeExecName);
-
-  // Load Manifest
-  std::unique_ptr<common::ApplicationData>
-      appdata(new common::ApplicationData(appid));
-  if (!appdata->LoadManifestData()) {
-    return false;
-  }
-
   // Init AppDB for Runtime
   common::AppDB* appdb = common::AppDB::GetInstance();
   appdb->Set(kAppDBRuntimeSection, kAppDBRuntimeName, "xwalk-tizen");
-  appdb->Set(kAppDBRuntimeSection, kAppDBRuntimeAppID, appid);
+  appdb->Set(kAppDBRuntimeSection, kAppDBRuntimeAppID, app_id_);
   appdb->Remove(kAppDBRuntimeSection, kAppDBRuntimeBundle);
 
   // Init WebApplication
   native_window_ = CreateNativeWindow();
   STEP_PROFILE_START("WebApplication Create");
-  application_ = new WebApplication(native_window_, std::move(appdata));
+  application_ = new WebApplication(native_window_, std::move(app_data_));
   STEP_PROFILE_END("WebApplication Create");
   application_->set_terminator([](){ ui_app_exit(); });
 

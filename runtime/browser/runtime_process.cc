@@ -18,12 +18,24 @@
 
 #include <Elementary.h>
 
+#include "common/application_data.h"
 #include "common/command_line.h"
 #include "common/logger.h"
 #include "common/profiler.h"
 #include "runtime/browser/runtime.h"
+#include "runtime/browser/ime_runtime.h"
+#include "runtime/common/constants.h"
 #include "runtime/browser/prelauncher.h"
 #include "runtime/browser/preload_manager.h"
+
+#ifdef IME_FEATURE_SUPPORT
+const char* kImeCategory = "http://tizen.org/category/ime";
+#endif  // IME_FEATURE_SUPPORT
+
+enum AppCategory {
+    APP_CATEGORY_NORMAL = 0,
+    APP_CATEGORY_IME
+};
 
 bool g_prelaunch = false;
 
@@ -52,9 +64,50 @@ int real_main(int argc, char* argv[]) {
   int ret = 0;
   // Runtime's destructor should be called before ewk_shutdown()
   {
-    runtime::Runtime runtime;
-    ret = runtime.Exec(argc, argv);
+    common::CommandLine* cmd = common::CommandLine::ForCurrentProcess();
+    std::string appid = cmd->GetAppIdFromCommandLine(runtime::kRuntimeExecName);
+
+    // Load Manifest
+    std::unique_ptr<common::ApplicationData>
+        appdata(new common::ApplicationData(appid));
+    if (!appdata->LoadManifestData()) {
+      return false;
+    }
+
+    int app_type = APP_CATEGORY_NORMAL;
+    if (appdata->category_info_list()) {
+      auto category_list = appdata->category_info_list()->categories;
+      auto it = category_list.begin();
+      auto end = category_list.end();
+      for (; it != end; ++it) {
+        if (*it == kImeCategory) {
+          app_type = APP_CATEGORY_IME;
+        }
   }
+    }
+
+    switch (app_type) {
+      case APP_CATEGORY_NORMAL:
+      {
+        runtime::Runtime* runtime =
+            new runtime::Runtime(std::move(appdata));
+        ret = runtime->Exec(argc, argv);
+        delete runtime;
+        break;
+  }
+#ifdef IME_FEATURE_SUPPORT
+      case APP_CATEGORY_IME:
+      {
+        runtime::ImeRuntime* ime_runtime =
+            new runtime::ImeRuntime(std::move(appdata));
+        ret = ime_runtime->Exec(argc, argv);
+        delete ime_runtime;
+        break;
+      }
+#endif  // IME_FEATURE_SUPPORT
+    }
+  }
+
   ewk_shutdown();
   exit(ret);
 
