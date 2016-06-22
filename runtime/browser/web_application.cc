@@ -316,6 +316,9 @@ bool WebApplication::Initialize() {
         ewk_context_, kVisibilitySuspendFeature, true);
     ewk_context_tizen_extensible_api_string_set(ewk_context_,
                                                 kBackgroundMusicFeature, true);
+  } else {
+    ewk_context_tizen_extensible_api_string_set(ewk_context_,
+                                               kBackgroundMusicFeature, false);
   }
   ewk_context_tizen_extensible_api_string_set(ewk_context_,
                                               kMediastreamRecordFeature, true);
