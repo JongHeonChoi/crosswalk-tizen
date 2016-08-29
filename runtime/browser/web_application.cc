@@ -357,6 +357,12 @@ bool WebApplication::Initialize() {
         ewk_context_, kBackgroundVibrationFeature, true);
   }
 
+  if (app_data_->setting_info() != NULL &&
+      app_data_->setting_info()->long_polling()) {
+    ewk_context_session_timeout_set(
+        ewk_context_, app_data_->setting_info()->long_polling());
+  }
+
   if (app_data_->widget_info() != NULL &&
       !app_data_->widget_info()->default_locale().empty()) {
     locale_manager_->SetDefaultLocale(
